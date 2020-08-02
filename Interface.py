@@ -9,12 +9,12 @@ label.config(font=("Roman bold", 30))
 label.grid(row=0, column=3)
 
 #cars
-reserve1 = PhotoImage(file = r".\BCarDown.png")
-reserve2 = PhotoImage(file = r".\BCarUp.png")
-libre1= PhotoImage(file = r".\GCarDown.png")
-libre2= PhotoImage(file = r".\GCarUp.png")
-occupe1= PhotoImage(file = r".\RCarDown.png")
-occupe2= PhotoImage(file = r".\RCarUp.png")
+reserve1 = PhotoImage(file = r".\images\BCarDown.png")
+reserve2 = PhotoImage(file = r".\images\BCarUp.png")
+libre1= PhotoImage(file = r".\images\GCarDown.png")
+libre2= PhotoImage(file = r".\images\GCarUp.png")
+occupe1= PhotoImage(file = r".\images\RCarDown.png")
+occupe2= PhotoImage(file = r".\images\RCarUp.png")
 
 #Car button exeample row1
 button1=Button(homePage, text = "Button", image = reserve1, bg='gray')
