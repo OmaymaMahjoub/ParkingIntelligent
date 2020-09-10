@@ -1,9 +1,11 @@
 class Client:
 
-    def __init__(self,cin,res_exist=True):
+    def __init__(self,cin,idEmpl,res_exist=True):
         self.__cin=cin
         #chaque client ne peut pas faire une reservation si une autre existe.
         self.__res_exist=res_exist
+        self.__idEmpl=idEmpl
+        
 
     def res_finis(self):
         self.__res_exist=False
@@ -26,5 +28,8 @@ class Client:
 
     def reservation_exist(self):
         return self.__res_exist
+
+    def get_emplacement(self):
+        return self.__idEmpl
 
     

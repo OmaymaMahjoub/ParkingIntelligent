@@ -15,9 +15,10 @@ def Home():
     surplace=Button(homePage,text ="Parking direct", bg='red', )
     surplace.place(x=350, y=100)
     homePage.mainloop()
-
+    
 #Gestion de reservartion
 def gest_reservation():
+    homePage.destroy()
     res= Tk()
     res['bg']='gray'
     labelr = Label(res, text="Gestion de réservartion", bg="gray", fg="SlateBlue4" )
@@ -29,6 +30,7 @@ def gest_reservation():
     reserverB.config(command = reserver() )
     valider = Button(res,text="Valider", bg='red')
     valider.place(x=350,y=100)
+    
     
 def reserver():
     print('testee')
