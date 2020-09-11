@@ -12,6 +12,8 @@ voitureBDOWN=PhotoImage(file = r".\images\BCarDown.png")
 #liste emplacemnt , w methode te3ha
 #methode add client
 
+
+
 Methode= True    # True direct , Fasle réservartion
 
 #Vérification du client
@@ -111,55 +113,111 @@ def reservartion(arg,num):
 
 
 #Affichage Parking
+#ROW1
+def DispoBut1(arg,ii,jj):
+    disponible= Button(arg,text="Emplacement Disponible",bg="green",command=choix(arg,ii))
+    disponible.grid(row=1,column=ii-jj)
+def ResBut1(arg,ii,jj):
+    reservé=Button(arg,text="Emplacement Reservé",image=voitureBDOWN,bg='blue',command=choix(arg,ii))
+    reservé.grid(row=1,column=ii-jj)
+def OccupBut1(arg,ii,jj):
+    occupé=Button(arg,text="Emplacement Occupé",image=voitureRDOWN,bg='red')
+    occupé.grid(row=1,column=ii-jj)
+def ProcheBut1(arg,ii,jj):
+    proche=Button(arg,text="Emplacement le plus proche",bg="yellow")
+    proche.grid(row=1,column=ii-jj)
+#ROW2
+def DispoBut2(arg,ii,jj):
+    disponible= Button(arg,text="Emplacement Disponible",bg="green",command=choix(arg,ii))
+    disponible.grid(row=2,column=ii-jj)
+def ResBut2(arg,ii,jj):
+    reservé=Button(arg,text="Emplacement Reservé",image=voitureBUP,bg='blue',command=choix(arg,ii))
+    reservé.grid(row=2,column=ii-jj)
+def OccupBut2(arg,ii,jj):
+    occupé=Button(arg,text="Emplacement Occupé",image=voitureRUP,bg='red')
+    occupé.grid(row=2,column=ii-jj)
+def ProcheBut2(arg,ii,jj):
+    proche=Button(arg,text="Emplacement le plus proche",bg="yellow")
+    proche.grid(row=2,column=ii-jj)
+#plus proche
+
 def Affichage(arg,h,d): #paramtre l durée wl wakt 
     arg.destroy()
     arg= Tk()
     arg['bg']='gray'
-    #updateliste_emplacmenet()
-    if (((len(list_emplacement))/2)==0):
-        for i in range(len(list_emplacement)+1):
-            if (i<(len(list_emplacement)/2)):
-                if (list_emplacemnt[i]==0):
-                    disponible= Button(arg,text="Emplacement Disponible",bg="green",command=choix(arg,i))
-                    disponible.grid(row=1,column=i)
-                elif (list_emplacement[i]==1):
-                    reservé=Button(arg,text="Emplacement Reservé",image=voitureBDOWN,bg='blue',command=choix(arg,i))
-                    reservé.grid(row=1,column=i)
+    #updateliste_emplacmenet(h,d)
+    n=len(list_emplacement)
+    if ((n/2)==0):
+        #l foo9
+        i=0
+        j=0
+        while (i<n-1):
+            if (list_emplacemnt[i]==0):
+                if (plusproche(liste_emplacement)==i):
+                    ProcheBut1(arg,i,j)
                 else:
-                    occupé=Button(arg,text="Emplacement Occupé",image=voitureRDOWN,bg='red')
-                    occupé.grid(row=1,column=i)
+                    DispoBut1(arg,i,j)
+            elif (list_emplacement[i]==1):
+                ResBut1(arg,i,j)
             else:
-                if (list_emplacemnt[i]==0):
-                        disponible= Button(arg,text="Emplacement Disponible",bg="green",command=choix(arg,i))
-                        disponible.grid(row=2,column=i-(len(list_emplacement)/2))
-                elif (list_emplacement[i]==1):
-                        reservé=Button(arg,text="Emplacement Reservé",image=voitureBUP,bg='blue',command=choix(arg,i))
-                        reservé.grid(row=2,column=i-(len(list_emplacement)/2))
-                else:
-                        occupé=Button(arg,text="Emplacement Occupé",image=voitureRUP,bg='red',command=choix(arg,i))
-                        occupé.grid(row=2,column=i-(len(list_emplacement)/2))
+                OccupBut1(arg,i,j)
+            i+=2
+            j+=1
+        #loota   
+        i=1
+        j=1
+        while(i<n)
+            if (plusproche(liste_emplacement)==i):
+                ProcheBut2(arg,i,j)
+            elif (list_emplacemnt[i]==0):
+                DispoBut2(arg,i,j)
+            elif (list_emplacement[i]==1):
+                ResBut2(arg,i,j)j)
+            else:
+                OccupBut2(arg,i,j)
+            i+=2
+            j+=1
     else:
-        for i in range(len(list_emplacement)+1):
-            if (i<((len(list_emplacement)+1)/2)):
-                if (list_emplacemnt[i]==0):
-                    disponible= Button(arg,text="Emplacement Disponible",bg="green",command=choix(arg,i))
-                    disponible.grid(row=1,column=i)
-                elif (list_emplacement[i]==1):
-                    reservé=Button(arg,text="Emplacement Reservé",image="",bg='blue',command=choix(arg,i))
-                    reservé.grid(row=1,column=i)
+        #foo9
+        i=0
+        j=0
+        while(i<n-1):
+            if (list_emplacemnt[i]==0):
+                if (plusproche(liste_emplacement)==i):
+                    ProcheBut1(arg,i,j)
                 else:
-                    occupé=Button(arg,text="Emplacement Occupé",image=voiture,bg='red')
-                    occupé.grid(row=1,column=i)
+                    DispoBut1(arg,i,j)
+            elif (list_emplacement[i]==1):
+                ResBut1(arg,i,j)
             else:
-                if (list_emplacemnt[i]==0):
-                        disponible= Button(arg,text="Emplacement Disponible",bg="green",command=choix(arg,i))
-                        disponible.grid(row=2,column=i-((len(list_emplacement)+1)/2))
-                elif (list_emplacement[i]==1):
-                        reservé=Button(arg,text="Emplacement Reservé",image="",bg='blue',command=choix(arg,i))
-                        reservé.grid(row=2,column=i-((len(list_emplacement)+1)/2))
+                OccupBut1(arg,i,j)
+            i+=2
+            j+=1
+        
+        #l foo9 ekher kaaba
+        if (list_emplacemnt[n]==0):
+            if (plusproche(liste_emplacement)==n):
+                ProcheBut1(arg,n,0)
+            else:
+                DispoBut1(arg,n,0)
+        elif (list_emplacement[n]==1):
+            ResBut1(arg,n,0)
+        elif (list_emplacement[n]==2):
+                OccupBut1(arg,n,0)
+
+        #loota
+        i=1
+        j=1
+        while (i<n):
+            if (list_emplacemnt[i]==0):
+                if(plusproche(liste_emplacement)==i):
+                    ProcheBut1(arg,n,0)
                 else:
-                        occupé=Button(arg,text="Emplacement Occupé",image=voiture,bg='red',command=choix(arg,i))
-                        occupé.grid(row=2,column=i-((len(list_emplacement)+1)/2))
+                    DispoBut2(arg,i,j)
+            elif (list_emplacement[i]==1):
+                ResBut2(arg,i,j)
+            else:
+                OccupBut2(arg,i,j)
 
 
 
@@ -170,6 +228,14 @@ def choix():
     else:
         #tekhoo l res heki w trodha occupé
 
+def plusproche(liste):
+    i=0
+    while (i<len(liste)):
+        if ((liste[i]==0):
+            return i
+        else:
+            i++
+    return -1
 
 #main
 Home()
