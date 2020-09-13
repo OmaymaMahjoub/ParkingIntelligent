@@ -1,5 +1,5 @@
 from tkinter import * 
-
+from BD import BD
 homePage = Tk()
 homePage['bg']='gray'
 
@@ -11,6 +11,9 @@ voitureBDOWN=PhotoImage(file = r".\images\BCarDown.png")
 #liste client tkoon global
 #liste emplacemnt , w methode te3ha
 #methode add client
+bd=BD("parking.sql")
+list_client=bd.listClients()
+list_emplacement=bd.listEmplacement()
 
 
 
@@ -21,15 +24,14 @@ def Recherche_Client(num):
    i=0
    test= False
    while (c in list_client):
-       if (c.get_cin()==num.get()):
-           test= True
-           break
-        else:
-            i++
-    if (test):
-        return i
-    else:
-        return -1
+      if (c.get_cin()==num.get()):
+         test= True
+      else:
+         i+=1
+   if (test):
+      return i
+   else:
+      return -1
 
 
 #Menu principal
@@ -51,8 +53,8 @@ def parking_direct():
     homePage.destroy()
     direct = Tk()
     direct['bg']='gray'
+    Label(direct, Text="Bienvenue, merci d'indiquer la durée de votre visite et puis choisir votre emplacement").grid(row=0)
     ed = Entry(direct, width= 60)
-    ed.insert(0, "Bienvenue, merci d'indiquer la durée de votre visite et puis choisir votre emplacement")
     ed.pack()
     confirmd= Button(direct,text="Choisir", bg='red')
     confirmd.pack()
@@ -74,12 +76,12 @@ def gest_reservation():
     reserver.config(command = reservartion(gres,er.get()) )
 
 def reservartion(arg,num):
-    arg.destroy():
+    arg.destroy()
     arg=Tk()
     arg['bg']='gray'
     Methode=False
     if ((Recherche_Client(num)!=-1)):
-        if (!(list_client[Recherche_Client(num)].reservation_exist())):
+        if (not(list_client[Recherche_Client(num)].reservation_exist())):
             label= Label(arg,text="On est heureux de vous revoir chez nous, merci d'indiquer l'heure et la durée de votre visite et puis choisir votre emplacement,merci ", bg="gray",fg="SlateBlue4")
             label.config(font=("Roman bold", 30))
             label.pack()
@@ -166,13 +168,13 @@ def Affichage(arg,h,d): #paramtre l durée wl wakt
         #loota   
         i=1
         j=1
-        while(i<n)
+        while(i<n):
             if (plusproche(liste_emplacement)==i):
                 ProcheBut2(arg,i,j)
             elif (list_emplacemnt[i]==0):
                 DispoBut2(arg,i,j)
             elif (list_emplacement[i]==1):
-                ResBut2(arg,i,j)j)
+                ResBut2(arg,i,j)
             else:
                 OccupBut2(arg,i,j)
             i+=2
@@ -222,19 +224,19 @@ def Affichage(arg,h,d): #paramtre l durée wl wakt
 
 
 #methode taa choix trod lista m réservation ==> occupé , w sinon tzid occupé  bl methode
-def choix():
-    if (Methode):
+#def choix():
+ #   if (Methode):
         #tzid juste occupé
-    else:
+ #   else:
         #tekhoo l res heki w trodha occupé
 
 def plusproche(liste):
     i=0
     while (i<len(liste)):
-        if ((liste[i]==0):
-            return i
-        else:
-            i++
+       if ((liste[i]==0)):
+          return i
+       else:
+          i+=1
     return -1
 
 #main

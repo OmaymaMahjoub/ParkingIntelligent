@@ -47,8 +47,6 @@ class BD:
             clients+=[c]
         curseur.close()
         conn.close()
-        client=clients[0]
-        print(client.get_cin(),client.reservation_exist(),client.get_emplacement())
         return clients
 
     def addClient(self,client):
