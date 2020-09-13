@@ -53,12 +53,10 @@ def parking_direct():
     homePage.destroy()
     direct = Tk()
     direct['bg']='gray'
-    Label(direct, Text="Bienvenue, merci d'indiquer la durée de votre visite et puis choisir votre emplacement").grid(row=0)
-    ed = Entry(direct, width= 60)
-    ed.pack()
-    confirmd= Button(direct,text="Choisir", bg='red')
-    confirmd.pack()
-    confirmd.config(command = Affichage(direct,ed.get()))
+    Label(direct, text="Bienvenue, merci d'indiquer la durée de votre visite et puis choisir votre emplacement").pack()
+    duree= Entry(direct, width= 60).pack()
+    confirmd= Button(direct,text="Choisir", bg='red').pack()
+    confirmd.config(command = Affichage(direct,duree.get()))
 
 #Gestion de reservartion
 def gest_reservation():
@@ -71,6 +69,7 @@ def gest_reservation():
     print("test")
     er=Entry(arg,width=60)
     er.insert(0,"Merci de nous fournir votre numéro de CIN")
+    er.pack()
     reserver = Button(gres,text="Reserver", bg="red")
     reserver.pack()
     reserver.config(command = reservartion(gres,er.get()) )
