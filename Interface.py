@@ -1,5 +1,8 @@
 from tkinter import * 
-from BD import BD
+from BD import *
+from Clients import *
+import datetime
+import time
 homePage = Tk()
 homePage['bg']='gray'
 
@@ -13,8 +16,8 @@ voitureBDOWN=PhotoImage(file = r".\images\BCarDown.png")
 #methode add client
 bd=BD("parking.sql")
 list_client=bd.listClients()
-list_emplacement=bd.listEmplacement()
-
+#list_emplacement=bd.listEmplacement()
+list_emplacement=[1,2,0,1,2,2,1,0]
 
 
 Methode= True    # True direct , Fasle réservartion
@@ -23,9 +26,10 @@ Methode= True    # True direct , Fasle réservartion
 def Recherche_Client(num):
    i=0
    test= False
-   while (c in list_client):
+   for c in list_client:
       if (c.get_cin()==num.get()):
          test= True
+         break
       else:
          i+=1
    if (test):
@@ -41,8 +45,8 @@ def Home():
     label.pack()
     reservation=Button(homePage,text ="Gestion de réservartion", bg='red' )
     reservation.pack()
-    reservation.config(command = gest_reservation )
-    surplace=Button(homePage,text ="Parking direct", bg='red', )
+    reservation.config(command = gest_reservation)
+    surplace=Button(homePage,text ="Parking direct", bg='red' )
     surplace.pack()
     surplace.config(command = parking_direct)
     homePage.mainloop()
@@ -54,9 +58,12 @@ def parking_direct():
     direct = Tk()
     direct['bg']='gray'
     Label(direct, text="Bienvenue, merci d'indiquer la durée de votre visite et puis choisir votre emplacement").pack()
-    duree= Entry(direct, width= 60).pack()
-    confirmd= Button(direct,text="Choisir", bg='red').pack()
-    confirmd.config(command = Affichage(direct,duree.get()))
+    duree= Entry(direct, width= 60)
+    duree.insert(0,"Durée de visite")
+    duree.pack()
+    confirmd= Button(direct,text="Choisir", bg='red')
+    confirmd.pack()
+    confirmd.config(command = Affichage(direct,datetime.datetime.now(),duree.get()))
 
 #Gestion de reservartion
 def gest_reservation():
@@ -67,49 +74,50 @@ def gest_reservation():
     labelr.config(font=("Roman bold", 30))
     labelr.pack()
     print("test")
-    er=Entry(arg,width=60)
+    er=Entry(gres,width=60)
     er.insert(0,"Merci de nous fournir votre numéro de CIN")
     er.pack()
     reserver = Button(gres,text="Reserver", bg="red")
     reserver.pack()
-    reserver.config(command = reservartion(gres,er.get()) )
+    reserver.config(command=reservartion(gres,er.getint(er.get())))
+    
 
+#def test():
+    #print('test')
 def reservartion(arg,num):
     arg.destroy()
-    arg=Tk()
-    arg['bg']='gray'
+    res=Tk()
+    res['bg']='gray'
     Methode=False
     if ((Recherche_Client(num)!=-1)):
         if (not(list_client[Recherche_Client(num)].reservation_exist())):
-            label= Label(arg,text="On est heureux de vous revoir chez nous, merci d'indiquer l'heure et la durée de votre visite et puis choisir votre emplacement,merci ", bg="gray",fg="SlateBlue4")
+            label= Label(res,text="On est heureux de vous revoir chez nous, merci d'indiquer l'heure et la durée de votre visite et puis choisir votre emplacement,merci ", bg="gray",fg="SlateBlue4")
             label.config(font=("Roman bold", 30))
             label.pack()
-            heure= Entry(arg, width=60)
+            heure= Entry(res, width=60)
             heure.insert(0,"L'heure de votre arrivé")
-            dure= Entry(arg, width=60)
+            dure= Entry(res, width=60)
             dure.insert(0,"Durée") # bch taamel mise à jour 
-            chosisir=Button(arg,text="Chosir votre emplacement")
-            choisir.config(command=Affichage(arg,heure,dure)) #fct taamel l affichage
+            choisir=Button(res,text="Chosir votre emplacement")
+            choisir.config(command=Affichage(res,heure,dure)) #fct taamel l affichage
         else:
             #aando réser bch yconformi li hoa je 
-            confirm=Button(arg,text="Confirmer")
-            choisir.config(command= valider())        
+            confirm=Button(res,text="Confirmer")
+            confirm.config(command= valider())        
     else:
             #création d'un client
             label= Label(arg,text="Merci pour avoir nous visiter, Merci d'indiquer votre nom")
             label.config(font=("Roman bold", 30))
             label.pack()
-            nom= Entry(arg,width=60)
+            nom= Entry(res,width=60)
             nom.insert(0,"Votre nom")
-
-            Client(num,nom.get()).add_client() # nouveau client
-
-            heure= Entry(arg, width=60)
+            bd.addClient(Client(num,nom.get()))
+            heure= Entry(res, width=60)
             heure.insert(0,"L'heure de votre arrivé")
-            dure= Entry(arg, width=60)
+            dure= Entry(res, width=60)
             dure.insert(0,"Durée") # bch taamel mise à jour 
-            chosisir=Button(arg,text="Chosir votre emplacement")
-            choisir.config(command=Affichage(arg,heure,dure)) #fct taamel l affichag
+            choisir=Button(res,text="Chosir votre emplacement")
+            choisir.config(command=Affichage(res,heure,dure)) #fct taamel l affichag
         
 
 
@@ -144,38 +152,38 @@ def ProcheBut2(arg,ii,jj):
 
 def Affichage(arg,h,d): #paramtre l durée wl wakt 
     arg.destroy()
-    arg= Tk()
-    arg['bg']='gray'
+    aff= Tk()
+    aff['bg']='gray'
     #updateliste_emplacmenet(h,d)
     n=len(list_emplacement)
-    if ((n/2)==0):
+    if ((n%2)==0):
         #l foo9
         i=0
         j=0
         while (i<n-1):
-            if (list_emplacemnt[i]==0):
-                if (plusproche(liste_emplacement)==i):
-                    ProcheBut1(arg,i,j)
+            if (list_emplacement[i]==0):
+                if (plusproche(list_emplacement)==i):
+                    ProcheBut1(aff,i,j)
                 else:
-                    DispoBut1(arg,i,j)
+                    DispoBut1(aff,i,j)
             elif (list_emplacement[i]==1):
-                ResBut1(arg,i,j)
+                ResBut1(aff,i,j)
             else:
-                OccupBut1(arg,i,j)
+                OccupBut1(aff,i,j)
             i+=2
             j+=1
         #loota   
         i=1
         j=1
         while(i<n):
-            if (plusproche(liste_emplacement)==i):
-                ProcheBut2(arg,i,j)
-            elif (list_emplacemnt[i]==0):
-                DispoBut2(arg,i,j)
+            if (plusproche(list_emplacement)==i):
+                ProcheBut2(aff,i,j)
+            elif (list_emplacement[i]==0):
+                DispoBut2(aff,i,j)
             elif (list_emplacement[i]==1):
-                ResBut2(arg,i,j)
+                ResBut2(aff,i,j)
             else:
-                OccupBut2(arg,i,j)
+                OccupBut2(aff,i,j)
             i+=2
             j+=1
     else:
@@ -183,51 +191,56 @@ def Affichage(arg,h,d): #paramtre l durée wl wakt
         i=0
         j=0
         while(i<n-1):
-            if (list_emplacemnt[i]==0):
-                if (plusproche(liste_emplacement)==i):
-                    ProcheBut1(arg,i,j)
+            if (list_emplacement[i]==0):
+                if (plusproche(list_emplacement)==i):
+                    ProcheBut1(aff,i,j)
                 else:
-                    DispoBut1(arg,i,j)
+                    DispoBut1(aff,i,j)
             elif (list_emplacement[i]==1):
-                ResBut1(arg,i,j)
+                ResBut1(aff,i,j)
             else:
-                OccupBut1(arg,i,j)
+                OccupBut1(aff,i,j)
             i+=2
             j+=1
         
         #l foo9 ekher kaaba
-        if (list_emplacemnt[n]==0):
-            if (plusproche(liste_emplacement)==n):
-                ProcheBut1(arg,n,0)
+        if (list_emplacement[n]==0):
+            if (plusproche(list_emplacement)==n):
+                ProcheBut1(aff,n,0)
             else:
-                DispoBut1(arg,n,0)
+                DispoBut1(aff,n,0)
         elif (list_emplacement[n]==1):
-            ResBut1(arg,n,0)
+            ResBut1(aff,n,0)
         elif (list_emplacement[n]==2):
-                OccupBut1(arg,n,0)
+                OccupBut1(aff,n,0)
 
         #loota
         i=1
         j=1
         while (i<n):
-            if (list_emplacemnt[i]==0):
-                if(plusproche(liste_emplacement)==i):
-                    ProcheBut1(arg,n,0)
+            if (list_emplacement[i]==0):
+                if(plusproche(list_emplacement)==i):
+                    ProcheBut1(aff,n,0)
                 else:
-                    DispoBut2(arg,i,j)
+                    DispoBut2(aff,i,j)
             elif (list_emplacement[i]==1):
-                ResBut2(arg,i,j)
+                ResBut2(aff,i,j)
             else:
-                OccupBut2(arg,i,j)
-
+                OccupBut2(aff,i,j)
+    aff.mainloop()
 
 
 #methode taa choix trod lista m réservation ==> occupé , w sinon tzid occupé  bl methode
-#def choix():
- #   if (Methode):
+#def valider()
+ #tekhoo l res heki w trodha occupé
+
+def choix():
+    if (Methode):
         #tzid juste occupé
- #   else:
+        print("testee")
+    else:
         #tekhoo l res heki w trodha occupé
+        print("testeezef")
 
 def plusproche(liste):
     i=0
