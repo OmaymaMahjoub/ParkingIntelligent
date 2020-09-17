@@ -27,8 +27,8 @@ class BD:
         n=0
         for i in range(0,nbrEtage):
             for j in range(0,nbrEmplacement[i]):
-                sql3="insert into PARKING values (?,?,?,'')"
-                curseur.execute(sql3,[n,i+1,datetime.datetime.now()])
+                sql3="insert into PARKING values (?,?,'','')"
+                curseur.execute(sql3,[n,i+1])
                 n+=1        
         conn.commit()
         curseur.close()
@@ -112,14 +112,20 @@ class BD:
             etage=int(l[i][1])
             #date reservation
             r=[]
-            r=l[i][2].split("*")
-            for j in range (0,len(r)):
-                r[j]=self.stringtotime(r[j])
+            if (l[i][2]==''):
+                r=[]
+            else:
+                r=l[i][2].split("*")
+                for j in range (0,len(r)):
+                    r[j]=self.stringtotime(r[j])
             #date occupée
             o=[]
-            o=l[i][2].split("*")
-            for j in range (0,len(o)):
-                o[j]=self.stringtotime(o[j])
+            if (l[i][3]==''):
+                o=[]
+            else:
+                o=l[i][3].split("*")
+                for j in range (0,len(o)):
+                    o[j]=self.stringtotime(o[j])
             emplacement=Emplacement(id,etage,r,o)
             parking[etage-1].append(emplacement)
         for i in range(0, len(parking)):

@@ -12,6 +12,10 @@ class Emplacement:
         self.__date_res=date_res
         #occupé est une liste de deux elements la première est l'heure de début d'occupation la deuxième de fin
         self.__occupe=occupe
+        if (occupe!=[]):
+            while(occupe[1]>=datetime.datetime.now()):
+                False
+            self.__occupe=[]
 
     def get_id(self):
         return self.__id
@@ -52,19 +56,20 @@ class Emplacement:
         return True
 
     def estOccupe(self,fin):
+        print(self.__occupe)
         #debut est le temps courant
         #verifier si il y a une reservation on cour
         if (len(self.__occupe)!=0):
-            return True
+            return 1
         if(len(self.__date_res)==0):
-            return False
+            return 0
         if(len(self.__date_res)==2):
             if(datetime.datetime.now()>=self.__date_res[1]):
-                return False
+                return 0
         else:
             if((datetime.datetime.now()>=self.__date_res[1])and(fin<=self.__date_res[2])):
-                return False
-        return True
+                return 0
+        return 2
 
     def occupe(self,fin):
         if(fin<=datetime.datetime.now()):
