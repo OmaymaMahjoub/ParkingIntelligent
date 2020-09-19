@@ -107,24 +107,25 @@ class BD:
         sql2="SELECT * FROM PARKING "
         curseur.execute(sql2)
         l=curseur.fetchall()
+        print(l)
         for i in range(len(l)):
             id=int(l[i][0])
             etage=int(l[i][1])
             #date reservation
             r=[]
-            if (l[i][2]==''):
+            if ((l[i][2]=='')or(l[i][2]=='*')):
                 r=[]
             else:
                 r=l[i][2].split("*")
-                for j in range (0,len(r)):
+                for j in range (1,len(r)):
                     r[j]=self.stringtotime(r[j])
             #date occupée
             o=[]
-            if (l[i][3]==''):
+            if ((l[i][3]=='')or(l[i][3]=='*')):
                 o=[]
             else:
                 o=l[i][3].split("*")
-                for j in range (0,len(o)):
+                for j in range (1,len(o)):
                     o[j]=self.stringtotime(o[j])
             emplacement=Emplacement(id,etage,r,o)
             parking[etage-1].append(emplacement)
@@ -140,16 +141,17 @@ class BD:
         #time to string
         rstr=""
         r=e.get_date_de_res()
+        print(r)
         for i in range (0,len(r)):
-            rstr=rstr+"*"+str(r)
+            rstr=rstr+"*"+str(r[i])
         ostr=""
         o=e.get_occupe()
         for i in range (0,len(o)):
-            ostr=ostr+"*"+str(o)
+            ostr=ostr+"*"+str(o[i])
         #update
-        sql="UPDATE PARKING SET reservation=?, occupe=? WHERE idEmpl=?"
+        sql="UPDATE PARKING SET reservation=?, occupe=? WHERE idEmp=?"
         curseur.execute(sql,[rstr,ostr,e.get_id()])
-        curseur.commit()
+        conn.commit()
         curseur.close()
         conn.close()
     
