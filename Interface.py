@@ -25,7 +25,6 @@ bd=BD("parking.sql")
 list_client=bd.listClients()
 list_emplacement=bd.listEmplacement()
 
-print(list_emplacement[0][1].get_date_de_res())
 
 #Vérification du client
 def Recherche_Client(num):
@@ -85,18 +84,19 @@ def gest_reservation():
     labelr = Label(gres, text="Gestion de réservartion", bg="gray", fg="SlateBlue4" )
     labelr.config(font=("Roman bold", 30))
     labelr.pack()
-    print("test")
-    er=Entry(gres,width=60, textvariable=DoubleVar())
-    er.insert(0,"Merci de nous fournir votre numéro de CIN")
-    er.pack()
-    global n
-    n=er.get()
+    cin=Entry(gres,width=60, textvariable=DoubleVar())
+    cin.insert(0,"Merci de nous fournir votre numéro de CIN")
+    cin.pack()
+    global ciin
+    ciin=cin
     reserver = Button(gres,text="Reserver", bg="red")
     reserver.pack()
     reserver.config(command=reservartion)
     
 
 def reservartion():
+    global cin
+    cin=getint(ciin.get())
     print('testeee')
     gres.destroy()
     global res
@@ -104,8 +104,8 @@ def reservartion():
     res['bg']='gray'
     global Methode
     Methode=False
-    if ((Recherche_Client(n)!=-1)):
-        if (not(list_client[Recherche_Client(n)].reservation_exist())):
+    if ((Recherche_Client(cin)!=-1)):
+        if (not(list_client[Recherche_Client(cin)].reservation_exist())):
             label= Label(res,text="On est heureux de vous revoir chez nous, merci d'indiquer l'heure et la durée de votre visite et puis choisir votre emplacement,merci ", bg="gray",fg="SlateBlue4")
             label.config(font=("Roman bold", 30))
             label.pack()
@@ -129,6 +129,8 @@ def reservartion():
             nom= Entry(res,width=60)
             nom.insert(0,"Votre nom")
             nom.pack()
+            global name
+            name=nom.get()
             #bd.addClient(Client(n,nom.get()))
             heure= Entry(res, width=60,textvariable=DoubleVar())
             heure.pack()
@@ -150,8 +152,8 @@ def DispoBut1(arg,ii,jj):
     disponible.grid(row=1,column=ii-jj)
     disponible.config(command=lambda:choix(ii))
 def ResBut1(arg,ii,jj):
-    reservé=Button(arg,text="Emplacement Reservé",image=voitureBDOWN,bg='blue')
-    reservé.grid(row=1,column=ii-jj)
+    reserve=Button(arg,text="Emplacement Reservé",image=voitureBDOWN,bg='blue')
+    reserve.grid(row=1,column=ii-jj)
 def OccupBut1(arg,ii,jj):
     occupé=Button(arg,text="Emplacement Occupé",image=voitureRDOWN,bg='red')
     occupé.grid(row=1,column=ii-jj)
@@ -165,8 +167,8 @@ def DispoBut2(arg,ii,jj):
     disponible.grid(row=2,column=ii-jj)
     disponible.config(command=lambda:choix(ii))
 def ResBut2(arg,ii,jj):
-    reservé=Button(arg,text="Emplacement Reservé",image=voitureBUP,bg='blue')
-    reservé.grid(row=2,column=ii-jj)
+    reserve=Button(arg,text="Emplacement Reservé",image=voitureBUP,bg='blue')
+    reserve.grid(row=2,column=ii-jj)
 def OccupBut2(arg,ii,jj):
     occupé=Button(arg,text="Emplacement Occupé",image=voitureRUP,bg='red')
     occupé.grid(row=2,column=ii-jj)
@@ -200,7 +202,7 @@ def Affichage():
         i=0
         j=0
         while (i<n-1):
-            list_emplacement[0][i].update()
+
             if (list_emplacement[0][i].state(debut,fin)==0):
                 if (plusproche(list_emplacement)==i):
                     ProcheBut1(aff,i,j)
@@ -216,7 +218,7 @@ def Affichage():
         i=1
         j=1
         while(i<n):
-            list_emplacement[0][i].update()
+
             if (list_emplacement[0][i].state(debut,fin)==0):
                 if (plusproche(list_emplacement)==i):
                     ProcheBut2(aff,i,j)
@@ -233,7 +235,7 @@ def Affichage():
         i=0
         j=0
         while(i<=n-1):
-            list_emplacement[0][i].update()
+
             if (list_emplacement[0][i].state(debut,fin)==0):
                 if (plusproche(list_emplacement)==i):
                     ProcheBut1(aff,i,j)
@@ -250,7 +252,7 @@ def Affichage():
         i=1
         j=1
         while (i<n):
-            list_emplacement[0][i].update()
+ 
             if (list_emplacement[0][i].state(debut,fin)==0):
                 if(plusproche(list_emplacement)==i):
                     ProcheBut2(aff,i,j)
@@ -264,7 +266,7 @@ def Affichage():
                 #l foo9 ekher kaaba
             i+=2
             j+=1
-        list_emplacement[0][n].update()
+
         if (list_emplacement[0][n].state(debut,fin)==0):
             if (plusproche(list_emplacement)==n):
                 ProcheBut1(aff,n,0)
@@ -285,8 +287,21 @@ def choix(x):
         bd.updateEmplacement(list_emplacement[0][x])
         Home()
     else:
+        print(name)
+        print(cin)
+        print(x)
         list_emplacement[0][x].add_reservation(debut,fin)
         bd.updateEmplacement(list_emplacement[0][x])
+        if (Recherche_Client(cin)==-1):
+           
+           c=Client(name,cin,x,True,[debut,fin])
+           list_client.append(c)
+           bd.addClient(c)
+        else:
+           c=Client(name,cin,x,True,[debut,fin])
+           k=Recherche_Client(cin)
+           list_client[k]=c
+           bd.updateClient(c)
         aff.destroy()
         Home()
         

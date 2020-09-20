@@ -21,7 +21,7 @@ class BD:
         sql1="CREATE TABLE PARKING(idEmp INTEGER PRIMARY KEY,idEtage INTEGER,reservation TEXT,occupe TEXT)"
         curseur.execute(sql1)
         #creation de tableau de clients
-        sql2="CREATE TABLE CLIENT( cin INTEGER PRIMARY KEY, reservation INTEGER,idEmpl INTEGER,FOREIGN KEY(idEmpl) REFERENCES EMPLACEMENT(id))"
+        sql2="CREATE TABLE CLIENT(name TEXT, cin INTEGER PRIMARY KEY, reservation INTEGER,periode TEXT,idEmpl INTEGER,FOREIGN KEY(idEmpl) REFERENCES EMPLACEMENT(id))"
         curseur.execute(sql2)
         #ajouter les emplacement au BD
         n=0
@@ -34,6 +34,17 @@ class BD:
         curseur.close()
         conn.close()
 
+
+        
+    def stringtotime(self,c):
+        l=c.split(" ")
+        l1=l[0].split("-")
+        l2=l[1].split(":")
+        l2[2]=l2[2].split(".")[0]
+        return datetime.datetime(int(l1[0]),int(l1[1]),int(l1[2]),int(l2[0]),int(l2[1]),int(l2[2]))
+
+
+    
     #client
     def listClients(self):
         conn=sqlite3.connect(self.nomBD)
@@ -43,8 +54,15 @@ class BD:
         l=curseur.fetchall()
         clients=[]
         for i in range(0,len(l)):
-            c=Client(l[i][0],l[i][2],l[i][1])
+            if (l[i][3]=="*"):
+                periode=[]
+            else:
+                periode=l[i][3].split("*")
+                periode[0]=self.stringtotime(periode[0])
+                periode[1]=self.stringtotime(periode[1])
+            c=Client(l[i][0],l[i][1],l[i][4],l[i][2],periode)
             clients+=[c]
+        print(clients)
         curseur.close()
         conn.close()
         return clients
@@ -52,8 +70,13 @@ class BD:
     def addClient(self,client):
         conn=sqlite3.connect(self.nomBD)
         curseur=conn.cursor()
-        sql="INSERT INTO CLIENT VALUES(?,?,?)"
-        curseur.execute(sql,[client.get_cin(),client.reservation_exist(),client.get_emplacement()])
+        sql="INSERT INTO CLIENT VALUES(?,?,?,?,?)"
+        l=client.get_periode()
+        if (l==[]):
+            ch="*"
+        else:
+            ch=str(l[0])+"*"+str(l[1])
+        curseur.execute(sql,[client.get_nom(),client.get_cin(),client.reservation_exist(),ch,client.get_emplacement()])
         conn.commit()
         curseur.close()
         conn.close()
@@ -61,8 +84,13 @@ class BD:
     def updateClient(self,client):
         conn=sqlite3.connect(self.nomBD)
         curseur=conn.cursor()
-        sql="UPDATE CLIENT SET reservation=? , idEmpl=? WHERE cin=?"
-        curseur.execute(sql,[client.reservation_exist(),client.get_emplacement(),client.get_cin()])
+        sql="UPDATE CLIENT SET reservation=? , idEmpl=? ,periode=? WHERE cin=?"
+        l=client.get_periode()
+        if (l==[]):
+            ch="*"
+        else:
+            ch=str(l[0])+"*"+str(l[1])
+        curseur.execute(sql,[client.reservation_exist(),client.get_emplacement(),ch,client.get_cin()])
         conn.commit()
         curseur.close()
         conn.close()
@@ -87,13 +115,6 @@ class BD:
 
 
     #Parking
-        
-    def stringtotime(self,c):
-        l=c.split(" ")
-        l1=l[0].split("-")
-        l2=l[1].split(":")
-        l2[2]=l2[2].split(".")[0]
-        return datetime.datetime(int(l1[0]),int(l1[1]),int(l1[2]),int(l2[0]),int(l2[1]),int(l2[2]))
     
     def listEmplacement(self):
         conn=sqlite3.connect(self.nomBD)
@@ -117,7 +138,8 @@ class BD:
                 r=[]
             else:
                 r=l[i][2].split("*")
-                for j in range (1,len(r)):
+                r=r[1:]
+                for j in range (0,len(r)):
                     r[j]=self.stringtotime(r[j])
             #date occupée
             o=[]
@@ -125,7 +147,8 @@ class BD:
                 o=[]
             else:
                 o=l[i][3].split("*")
-                for j in range (1,len(o)):
+                o=o[1:]
+                for j in range (0,len(o)):
                     o[j]=self.stringtotime(o[j])
             emplacement=Emplacement(id,etage,r,o)
             parking[etage-1].append(emplacement)

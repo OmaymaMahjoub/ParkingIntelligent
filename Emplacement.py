@@ -34,7 +34,11 @@ class Emplacement:
         if(len(self.__date_res)==0):
             return 0
         else:
-            if(fin<=self.__date_res[0]):
+            for i in range(0,len(self.__date_res)-1,2):
+                if ((self.__date_res[i]<=debut) and (self.__date_res[i+1]>=fin)):
+                    return 2
+            if((fin<=self.__date_res[0])or(debut>self.__date_res[-1])):
+                print("etapefaulse")
                 return 0
             else:
                 i=1
@@ -43,9 +47,8 @@ class Emplacement:
                         return 0
                     else:
                         i+=2
-                if(i==len(self.__date_res)-1):
-                    if(debut>=self.__date_res[i]):
-                        return 0
+                if(debut>=self.__date_res[-1]):
+                    return 0
             return 2
 
     def update(self):
@@ -59,7 +62,7 @@ class Emplacement:
                 if (self.__date_res[i]>datetime.datetime.now()):
                     break
             if(n!=len(self.__date_res)):
-                self.__date_res=self.__date_res[i+1:]
+                self.__date_res=self.__date_res[n+1:]
         print(self.__occupe)
         print(self.__date_res)
 
