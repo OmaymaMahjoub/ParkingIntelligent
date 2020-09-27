@@ -1,4 +1,5 @@
-from tkinter import * 
+from tkinter import *
+from tkinter import messagebox 
 from BD import *
 from Clients import Client
 from Emplacement import Emplacement
@@ -114,22 +115,34 @@ def gest_reservation():
     gres= Toplevel()
     gres['bg']='LightSkyBlue4'
     labelr = Label(gres, text="Gestion De Réservartion", bg='LightSkyBlue4', fg="SkyBlue3" )
-    labelr.config(font=("Roman bold", 30,"bold"))
+    labelr.config(font=("Roman bold", 40,"bold"))
     labelr.pack(pady=5)
-    cin=Entry(gres,width=60, textvariable=DoubleVar(), bg='LightSkyBlue3', fg="SkyBlue4")
+    cin=Entry(gres,width= 60, textvariable=DoubleVar(), bg='LightSkyBlue3', fg="SkyBlue4")
     cin.insert(0,"Merci de nous fournir votre numéro de CIN")
+    cin.config(font=("Roman bold", 17,"bold"))
     cin.pack(pady=20)
     global ciin
     ciin=cin
+    global reserver
     reserver = Button(gres,text="Reserver",  bg='Deep Sky Blue3', fg="dark slate gray",height=2,width=15)
     reserver.pack(pady=5)
     reserver.config(font=("Roman bold", 10,"bold"))
-    reserver.config(command=reservartion)
-    
+    reserver.config(command=verif_cin)
+    annuler= Button(gres,text="Annuler",  bg='Deep Sky Blue3', fg="dark slate gray",height=2,width=15)
+    annuler.pack(pady=8)
+    annuler.config(font=("Roman bold", 10,"bold"))
+    annuler.config(command = lambda: Home(2))
 
+def verif_cin():
+    if((len(ciin.get())==8)and (ciin.get().isdigit())):
+        reservartion()
+    else:
+        l2=Label(gres,text="*Verifiez le CIN", bg="LightSkyBlue4",fg="red")
+        l2.pack(pady=2, before=reserver)
+        
 def reservartion():
     global cin
-    cin=getint(ciin.get())
+    cin=str(ciin.get())
     print('testeee')
     gres.destroy()
     global res
@@ -137,6 +150,9 @@ def reservartion():
     res['bg']='LightSkyBlue4'
     global Methode
     Methode=False
+    global dure
+    global heure
+    global choisir
     if ((Recherche_Client(cin)!=-1)):
         if (not(list_client[Recherche_Client(cin)].reservation_exist())):
             label= Label(res,text="On est heureux de vous revoir chez nous, merci d'indiquer l'heure et la durée de votre visite et puis choisir votre emplacement,merci ", bg='LightSkyBlue4', fg="SkyBlue3")
@@ -169,7 +185,6 @@ def reservartion():
             nom.pack(pady=2)
             global name
             name=nom.get()
-            #bd.addClient(Client(n,nom.get()))
             heure= Entry(res, width=60,textvariable=DoubleVar(),bg='LightSkyBlue3', fg="SkyBlue4")
             heure.pack(pady=2)
             heure.insert(0,"L'heure de votre arrivé comme la suite YYYY-MM-DD HH:MM")
@@ -177,21 +192,64 @@ def reservartion():
             dure= Entry(res, width=60,textvariable=DoubleVar(),bg='LightSkyBlue3', fg="SkyBlue4")
             dure.config(font=("Roman bold", 17,"bold"))
             dure.pack(pady=2)
-            dure.insert(0,"Durée") # bch taamel mise à jour             
+            dure.insert(0,"Durée") # bch taamel mise à jour
             choisir=Button(res,text="Chosir votre emplacement",bg='Deep Sky Blue3', fg="dark slate gray",height=2,width=25)
             choisir.pack(pady=15)
             choisir.config(font=("Roman bold", 10,"bold"))
-            choisir.config(command=Affichage) #fct taamel l affichag
-            
-        
+            choisir.config(command=verif_date) #fct taamel l affichag
+            annuler= Button(res,text="Annuler",  bg='Deep Sky Blue3', fg="dark slate gray",height=2,width=15)
+            annuler.pack(pady=8)
+            annuler.config(font=("Roman bold", 10,"bold"))
+            annuler.config(command = lambda: Home(3))
 
-
+def verif_date():
+    test=0
+    test1=0
+    if ((heure.get().count("-")==2)and (heure.get().count(":")==1)):
+        l=(heure.get()).split(" ")
+        l1=l[0].split("-")
+        l2=l[1].split(":")
+        l=[]
+        l=l1+l2
+        if (len(l)!=5):
+            test=1
+        else:
+            for i in range(len(l)):
+                if (not(l[i].isdigit())):
+                    test=1
+            if (test==0):
+                try:
+                    global debut
+                    debut=datetime.datetime(int(str(l[0])),int(str(l[1])),int(str(l[2])),int(str(l[3])),int(str(l[4])))
+                    if (debut<datetime.datetime.now()):
+                        test=2
+                except ValueError:
+                    test=1
+    else:
+        test=1
+    if ((dure.get().isdigit())and(getint(dure.get())>0)):
+        if (getint(dure.get())>1440):
+            l3=Label(res,text="*La durée ne dépasse pas 1440 minutes (24H)", bg="LightSkyBlue4",fg="red")
+            l3.pack(pady=2, before=choisir)   
+        else :
+            test1=1
+    else:
+        l3=Label(res,text="*La durée doit etre en minutes", bg="LightSkyBlue4",fg="red")
+        l3.pack(pady=2, before=choisir)
+    if (test==1):
+        l2=Label(res,text="*Verifiez la date", bg="LightSkyBlue4",fg="red")
+        l2.pack(pady=2, before=dure)
+    elif (test==2):
+        l2=Label(res,text="*Date ne doit pas etre depassé", bg="LightSkyBlue4",fg="red")
+        l2.pack(pady=2, before=dure)
+    elif ((test==0) and(test1==1)):
+        Affichage()
 #Affichage Parking
 #ROW1
 def DispoBut1(arg,ii,jj):
     disponible= Button(arg,text="Emplacement Disponible",image=voitureGDOWN, bg="green")
     disponible.grid(row=1,column=ii-jj)
-    disponible.config(command=lambda:choix(ii))
+    disponible.config(command=lambda:confirmation(ii))
 def ResBut1(arg,ii,jj):
     reserve=Button(arg,text="Emplacement Reservé",image=voitureBDOWN,bg='blue')
     reserve.grid(row=1,column=ii-jj)
@@ -201,12 +259,12 @@ def OccupBut1(arg,ii,jj):
 def ProcheBut1(arg,ii,jj):
     proche=Button(arg,text="Emplacement le plus proche",image=voitureWDOWN, bg="yellow")
     proche.grid(row=1,column=ii-jj)
-    proche.config(command=lambda:choix(ii))
+    proche.config(command=lambda:confirmation(ii))
 #ROW2
 def DispoBut2(arg,ii,jj):
     disponible= Button(arg,text="Emplacement Disponible",image=voitureGUP,bg="green")
     disponible.grid(row=2,column=ii-jj)
-    disponible.config(command=lambda:choix(ii))
+    disponible.config(command=lambda:confirmation(ii))
 def ResBut2(arg,ii,jj):
     reserve=Button(arg,text="Emplacement Reservé",image=voitureBUP,bg='blue')
     reserve.grid(row=2,column=ii-jj)
@@ -216,7 +274,7 @@ def OccupBut2(arg,ii,jj):
 def ProcheBut2(arg,ii,jj):
     proche=Button(arg,text="Emplacement le plus proche",image=voitureWUP,bg="yellow")
     proche.grid(row=2,column=ii-jj)
-    proche.config(command=lambda:choix(ii))
+    proche.config(command=lambda:confirmation(ii))
 
 def Affichage():
     global debut
@@ -229,8 +287,6 @@ def Affichage():
        direct.destroy()
     else:
        d=getint(dure.get())
-       l=(heure.get()).split("-")
-       debut=datetime.datetime(int(str(l[0])),int(str(l[1])),int(str(l[2])),int(str(l[3])),int(str(l[4])))
        fin=datetime.timedelta(minutes=d)+debut
        gres.destroy
     global aff
@@ -319,8 +375,10 @@ def Affichage():
                 OccupBut1(aff,n,0)
     aff.mainloop()
 
-
-
+def confirmation(x):
+    MsgBox=messagebox.askquestion("Confirmation","Prière confirmer votre choix:\n\tEmplacement:"+str(list_emplacement[0][x].get_id())+"\n\tEtage:"+str(1)+"\n\tDebut:"+str(debut)+"\n\tFin:"+str(fin))
+    if (MsgBox=='yes'):
+        choix(x)
 def choix(x):
     if (Methode):
         list_emplacement[0][x].occupe(fin)
