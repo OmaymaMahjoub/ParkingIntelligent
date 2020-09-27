@@ -26,6 +26,70 @@ list_client=bd.listClients()
 list_emplacement=bd.listEmplacement()
 
 
+
+
+#Menu principal
+def Home(i=0):
+    if (i==1):
+        direct.destroy()
+    elif (i==2):
+        gres.destroy()
+    elif (i==3):
+        res.destroy()
+    global homePage
+    homePage = Toplevel()
+    homePage['bg']='LightSkyBlue4'
+    label = Label(homePage, text="Bienvenue",bg='LightSkyBlue4', fg="SkyBlue3" )
+    label.config(font=("Roman bold", 60,"bold"))
+    label.pack(pady=5)
+    reservation=Button(homePage,text ="Gestion de réservartion", bg='Deep Sky Blue3' ,fg='dark slate gray',height=4,width=25)
+    reservation.pack(pady=40)
+    reservation.config(font=("Roman bold", 17,"bold"))
+    reservation.config(command = gest_reservation)
+    surplace=Button(homePage,text ="Parking direct", bg='Deep Sky Blue3', fg="dark slate gray",height=4,width=25 )
+    surplace.pack(pady=10)
+    surplace.config(font=("Roman bold", 17,"bold"))
+    surplace.config(command = parking_direct)
+    homePage.mainloop()
+
+#Parking sur place
+def parking_direct():
+    global Methode
+    Methode=True
+    homePage.destroy()
+    global direct 
+    direct = Toplevel()
+    direct['bg']='LightSkyBlue4'
+    l=Label(direct, text="Bienvenue, merci d'indiquer la durée de \nvotre visite et puis choisir votre emplacement",bg='LightSkyBlue4', fg="SkyBlue3")
+    l.pack(pady=50)
+    l.config(font=("Roman bold", 40,"bold"))
+    global duree
+    duree= Entry(direct,width= 60,textvariable=DoubleVar(), bg='LightSkyBlue3', fg="SkyBlue4")
+    duree.insert(0,"Durée de visite en minutes")
+    duree.config(font=("Roman bold", 17,"bold"))
+    duree.pack(pady=2)
+    global confirmd
+    confirmd= Button(direct,text="Choisir",  bg='Deep Sky Blue3', fg="dark slate gray",height=2,width=15)
+    confirmd.pack()
+    confirmd.config(font=("Roman bold", 10,"bold"))
+    confirmd.config(command = validation)
+    annuler= Button(direct,text="Annuler",  bg='Deep Sky Blue3', fg="dark slate gray",height=2,width=15)
+    annuler.pack(pady=8)
+    annuler.config(font=("Roman bold", 10,"bold"))
+    annuler.config(command = lambda: Home(1))
+
+def validation():
+    if ((duree.get().isdigit())and(getint(duree.get())>0)):
+        if (getint(duree.get())>1440):
+            l2=Label(direct,text="*La durée ne dépasse pas 1440 minutes (24H)", bg="LightSkyBlue4",fg="red")
+            l2.pack(pady=2, before=confirmd)   
+        else :
+            Affichage()
+    else:
+        l2=Label(direct,text="*La durée doit etre en minutes", bg="LightSkyBlue4",fg="red")
+        l2.pack(pady=2, before=confirmd)
+
+
 #Vérification du client
 def Recherche_Client(num):
    i=0
@@ -42,55 +106,24 @@ def Recherche_Client(num):
       return -1
 
 
-#Menu principal
-def Home():
-    global homePage
-    homePage = Toplevel()
-    homePage['bg']='gray'
-    label = Label(homePage, text="Bienvenue", bg="gray", fg="SlateBlue4" )
-    label.config(font=("Roman bold", 30))
-    label.pack()
-    reservation=Button(homePage,text ="Gestion de réservartion", bg='red' )
-    reservation.pack()
-    reservation.config(command = gest_reservation)
-    surplace=Button(homePage,text ="Parking direct", bg='red' )
-    surplace.pack()
-    surplace.config(command = parking_direct)
-    homePage.mainloop()
 
-#Parking sur place
-def parking_direct():
-    global Methode
-    Methode=True
-    homePage.destroy()
-    global direct 
-    direct = Toplevel()
-    direct['bg']='gray'
-    Label(direct, text="Bienvenue, merci d'indiquer la durée de votre visite et puis choisir votre emplacement").pack()
-    global duree
-    duree= Entry(direct, width= 60)
-    duree.insert(0,"Durée de visite en minutes")
-    duree.pack()
-    confirmd= Button(direct,text="Choisir", bg='red')
-    confirmd.pack()
-    confirmd.config(command = Affichage)
-
-#Gestion de reservartion
+#Gestion de reservartion  
 def gest_reservation():
     homePage.destroy()
     global gres
     gres= Toplevel()
-    gres['bg']='gray'
-    labelr = Label(gres, text="Gestion de réservartion", bg="gray", fg="SlateBlue4" )
-    labelr.config(font=("Roman bold", 30))
-    labelr.pack()
-    cin=Entry(gres,width=60, textvariable=DoubleVar())
+    gres['bg']='LightSkyBlue4'
+    labelr = Label(gres, text="Gestion De Réservartion", bg='LightSkyBlue4', fg="SkyBlue3" )
+    labelr.config(font=("Roman bold", 30,"bold"))
+    labelr.pack(pady=5)
+    cin=Entry(gres,width=60, textvariable=DoubleVar(), bg='LightSkyBlue3', fg="SkyBlue4")
     cin.insert(0,"Merci de nous fournir votre numéro de CIN")
-    cin.pack()
+    cin.pack(pady=20)
     global ciin
     ciin=cin
-    reserver = Button(gres,text="Reserver", bg="red")
-    reserver.pack()
+    reserver = Button(gres,text="Reserver",  bg='Deep Sky Blue3', fg="dark slate gray",height=2,width=15)
+    reserver.pack(pady=5)
+    reserver.config(font=("Roman bold", 10,"bold"))
     reserver.config(command=reservartion)
     
 
@@ -101,21 +134,25 @@ def reservartion():
     gres.destroy()
     global res
     res=Toplevel()
-    res['bg']='gray'
+    res['bg']='LightSkyBlue4'
     global Methode
     Methode=False
     if ((Recherche_Client(cin)!=-1)):
         if (not(list_client[Recherche_Client(cin)].reservation_exist())):
-            label= Label(res,text="On est heureux de vous revoir chez nous, merci d'indiquer l'heure et la durée de votre visite et puis choisir votre emplacement,merci ", bg="gray",fg="SlateBlue4")
-            label.config(font=("Roman bold", 30))
-            label.pack()
+            label= Label(res,text="On est heureux de vous revoir chez nous, merci d'indiquer l'heure et la durée de votre visite et puis choisir votre emplacement,merci ", bg='LightSkyBlue4', fg="SkyBlue3")
+            label.config(font=("Roman bold", 20,"bold"))
+            label.pack(pady=10)
             global heure
-            heure= Entry(res, width=60,textvariable=DoubleVar())
+            heure= Entry(res, width=60,textvariable=DoubleVar(),bg='LightSkyBlue3', fg="SkyBlue4")
             heure.insert(0,"L'heure de votre arrivé")
+            heure.pack(pady=2)
             global dure
-            dure= Entry(res, width=60,textvariable=DoubleVar())
+            dure= Entry(res, width=60,textvariable=DoubleVar(),bg='LightSkyBlue3', fg="SkyBlue4")
             dure.insert(0,"Durée") # bch taamel mise à jour 
-            choisir=Button(res,text="Chosir votre emplacement")
+            duree.pack(pady=2)
+            choisir=Button(res,text="Chosir votre emplacement", bg='Deep Sky Blue3', fg="dark slate gray",height=2,width=25)
+            choisir.pack(pady=2)
+            choisir.config(font=("Roman bold", 10,"bold"))
             choisir.config(command=Affichage(heure1,dure1)) #fct taamel l affichage
         else:
             #aando réser bch yconformi li hoa je 
@@ -123,23 +160,27 @@ def reservartion():
             confirm.config(command= valider)     
     else:
             #création d'un client
-            label= Label(res,text="Merci pour avoir nous visiter, Merci d'indiquer votre nom")
-            label.config(font=("Roman bold", 30))
-            label.pack()
-            nom= Entry(res,width=60)
+            label= Label(res,text="Merci pour avoir nous visiter\n Merci d'indiquer votre nom",bg='LightSkyBlue4', fg="SkyBlue3")
+            label.config(font=("Roman bold", 40,"bold"))
+            label.pack(pady=25)
+            nom= Entry(res,width=60,textvariable=DoubleVar(),bg='LightSkyBlue3', fg="SkyBlue4")
             nom.insert(0,"Votre nom")
-            nom.pack()
+            nom.config(font=("Roman bold", 17,"bold"))
+            nom.pack(pady=2)
             global name
             name=nom.get()
             #bd.addClient(Client(n,nom.get()))
-            heure= Entry(res, width=60,textvariable=DoubleVar())
-            heure.pack()
-            heure.insert(0,"L'heure de votre arrivé")
-            dure= Entry(res, width=60,textvariable=DoubleVar())
-            dure.pack()
+            heure= Entry(res, width=60,textvariable=DoubleVar(),bg='LightSkyBlue3', fg="SkyBlue4")
+            heure.pack(pady=2)
+            heure.insert(0,"L'heure de votre arrivé comme la suite YYYY-MM-DD HH:MM")
+            heure.config(font=("Roman bold", 17,"bold"))
+            dure= Entry(res, width=60,textvariable=DoubleVar(),bg='LightSkyBlue3', fg="SkyBlue4")
+            dure.config(font=("Roman bold", 17,"bold"))
+            dure.pack(pady=2)
             dure.insert(0,"Durée") # bch taamel mise à jour             
-            choisir=Button(res,text="Chosir votre emplacement")
-            choisir.pack()
+            choisir=Button(res,text="Chosir votre emplacement",bg='Deep Sky Blue3', fg="dark slate gray",height=2,width=25)
+            choisir.pack(pady=15)
+            choisir.config(font=("Roman bold", 10,"bold"))
             choisir.config(command=Affichage) #fct taamel l affichag
             
         
@@ -304,6 +345,7 @@ def choix(x):
            bd.updateClient(c)
         aff.destroy()
         Home()
+
         
 #plus proche
 def plusproche(liste):
