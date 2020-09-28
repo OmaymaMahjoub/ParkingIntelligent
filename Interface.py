@@ -96,17 +96,30 @@ def Recherche_Client(num):
    i=0
    test= False
    for c in list_client:
-      if (c.get_cin()==num):
+      if (c.get_cin()==int(num)):
          test= True
          break
       else:
          i+=1
-   if (test):
+   if (test==True):
       return i
    else:
       return -1
 
-
+#Recherche emplacement
+def Recherche_Emplacement(id):
+   test= False
+   i=0
+   for c in list_emplacement[0]:
+      if (c.get_id()==id):
+         test=True
+         break
+      else:
+          i+=1
+   if (test==True):
+      return i
+   else:
+      return -1
 
 #Gestion de reservartion  
 def gest_reservation():
@@ -155,25 +168,42 @@ def reservartion():
     global choisir
     if ((Recherche_Client(cin)!=-1)):
         if (not(list_client[Recherche_Client(cin)].reservation_exist())):
-            label= Label(res,text="On est heureux de vous revoir chez nous, merci d'indiquer l'heure et la durée de votre visite et puis choisir votre emplacement,merci ", bg='LightSkyBlue4', fg="SkyBlue3")
-            label.config(font=("Roman bold", 20,"bold"))
-            label.pack(pady=10)
+            label= Label(res,text="On est heureux de vous revoir chez nous Mr/Mme "+list_client[Recherche_Client(cin)].get_nom()+",\nmerci d'indiquer l'heure et la durée de votre visite \net puis choisir votre emplacement,\nmerci ", bg='LightSkyBlue4', fg="SkyBlue3")
+            label.config(font=("Roman bold", 40,"bold"))
+            label.pack(pady=25)
             global heure
             heure= Entry(res, width=60,textvariable=DoubleVar(),bg='LightSkyBlue3', fg="SkyBlue4")
-            heure.insert(0,"L'heure de votre arrivé")
+            heure.insert(0,"L'heure de votre arrivé comme la suite YYYY-MM-DD HH:MM")
+            heure.config(font=("Roman bold", 17,"bold"))
             heure.pack(pady=2)
             global dure
             dure= Entry(res, width=60,textvariable=DoubleVar(),bg='LightSkyBlue3', fg="SkyBlue4")
             dure.insert(0,"Durée") # bch taamel mise à jour 
-            duree.pack(pady=2)
+            dure.config(font=("Roman bold", 17,"bold"))
+            dure.pack(pady=2)
             choisir=Button(res,text="Chosir votre emplacement", bg='Deep Sky Blue3', fg="dark slate gray",height=2,width=25)
             choisir.pack(pady=2)
             choisir.config(font=("Roman bold", 10,"bold"))
-            choisir.config(command=Affichage(heure1,dure1)) #fct taamel l affichage
+            choisir.config(command=verif_date)
+            annuler= Button(res,text="Annuler",  bg='Deep Sky Blue3', fg="dark slate gray",height=2,width=15)
+            annuler.pack(pady=8)
+            annuler.config(font=("Roman bold", 10,"bold"))
+            annuler.config(command = lambda: Home(3))
         else:
-            #aando réser bch yconformi li hoa je 
-            confirm=Button(res,text="Confirmer")
-            confirm.config(command= valider)     
+            c=list_client[Recherche_Client(cin)]
+            duration=c.get_periode()
+            if ((duration[0]<=datetime.datetime.now())and (datetime.datetime.now()<duration[1])):
+                MsgBox=messagebox.askquestion("Reservation","Vous avez une reservation\n\tEmplacement:"+str(c.get_emplacement())+"\n\tEtage:"+str(1)+"\n\tDebut:"+str(duration[0])+"\n\tFin:"+str(duration[1])+"\nCliquez non pour annuler la réservation")
+                if (MsgBox=='yes'):
+                    e=Recherche_Emplacement(c.get_emplacement())
+                    list_emplacement[0][e].fin_reservation()                        
+                    list_emplacement[0][e].occupe(duration[1])
+                    bd.updateEmplacement(list_emplacement[0][e])
+                else:
+                    e=Recherche_Emplacement(c.get_emplacement())
+                    list_emplacement[0][e].fin_reservation()
+                    bd.updateEmplacement(list_emplacement[0][e])
+            Home()
     else:
             #création d'un client
             label= Label(res,text="Merci pour avoir nous visiter\n Merci d'indiquer votre nom",bg='LightSkyBlue4', fg="SkyBlue3")
@@ -288,7 +318,7 @@ def Affichage():
     else:
        d=getint(dure.get())
        fin=datetime.timedelta(minutes=d)+debut
-       gres.destroy
+       res.destroy
     global aff
     aff= Toplevel()
     aff['bg']='gray'
@@ -386,21 +416,16 @@ def choix(x):
         bd.updateEmplacement(list_emplacement[0][x])
         Home()
     else:
-        print(name)
-        print(cin)
-        print(x)
         list_emplacement[0][x].add_reservation(debut,fin)
         bd.updateEmplacement(list_emplacement[0][x])
-        if (Recherche_Client(cin)==-1):
-           
+        if (Recherche_Client(cin)==-1):     
            c=Client(name,cin,x,True,[debut,fin])
            list_client.append(c)
            bd.addClient(c)
         else:
-           c=Client(name,cin,x,True,[debut,fin])
            k=Recherche_Client(cin)
-           list_client[k]=c
-           bd.updateClient(c)
+           list_client[k].reservation([debut,fin],x)
+           bd.updateClient(list_client[k])
         aff.destroy()
         Home()
 
