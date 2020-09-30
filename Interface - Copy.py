@@ -110,7 +110,7 @@ def Recherche_Client(num):
 def Recherche_Emplacement(id):
    test= False
    i=0
-   for c in list_emplacement[0]:
+   for c in list_emplacement:
       if (c.get_id()==id):
          test=True
          break
@@ -196,13 +196,13 @@ def reservartion():
                 MsgBox=messagebox.askquestion("Reservation","Vous avez une reservation\n\tEmplacement:"+str(c.get_emplacement())+"\n\tEtage:"+str(1)+"\n\tDebut:"+str(duration[0])+"\n\tFin:"+str(duration[1])+"\nCliquez non pour annuler la réservation")
                 if (MsgBox=='yes'):
                     e=Recherche_Emplacement(c.get_emplacement())
-                    list_emplacement[0][e].fin_reservation()                        
-                    list_emplacement[0][e].occupe(duration[1])
-                    bd.updateEmplacement(list_emplacement[0][e])
+                    list_emplacement[e].fin_reservation()                        
+                    list_emplacement[e].occupe(duration[1])
+                    bd.updateEmplacement(list_emplacement[e])
                 else:
                     e=Recherche_Emplacement(c.get_emplacement())
-                    list_emplacement[0][e].fin_reservation()
-                    bd.updateEmplacement(list_emplacement[0][e])
+                    list_emplacement[e].fin_reservation()
+                    bd.updateEmplacement(list_emplacement[e])
             Home()
     else:
             #création d'un client
@@ -278,146 +278,178 @@ def verif_date():
 #ROW1
 def DispoBut1(arg,ii,jj):
     disponible= Button(arg,text="Emplacement Disponible",image=voitureGDOWN, bg="green")
-    disponible.grid(row=1,column=ii-jj)
-    disponible.config(command=lambda:confirmation(ii-jj))
+    disponible.grid(row=3,column=ii+1)
+    global e
+    p=0
+    for i in range(1,e):
+       p+=len(parEtage(i))
+    jj+=p
+    disponible.config(command=lambda:confirmation(jj))
 def ResBut1(arg,ii,jj):
     reserve=Button(arg,text="Emplacement Reservé",image=voitureBDOWN,bg='blue')
-    reserve.grid(row=1,column=ii-jj)
+    reserve.grid(row=3,column=ii+1)
 def OccupBut1(arg,ii,jj):
     occupé=Button(arg,text="Emplacement Occupé",image=voitureRDOWN,bg='red')
-    occupé.grid(row=1,column=ii-jj)
+    occupé.grid(row=3,column=ii+1)
 def ProcheBut1(arg,ii,jj):
     proche=Button(arg,text="Emplacement le plus proche",image=voitureWDOWN, bg="yellow")
-    proche.grid(row=1,column=ii-jj)
-    proche.config(command=lambda:confirmation(ii-jj))
+    proche.grid(row=3,column=ii+1)
+    global e
+    p=0
+    for i in range(1,e):
+       p+=len(parEtage(i))
+    jj+=p
+    proche.config(command=lambda:confirmation(jj))
 #ROW2
 def DispoBut2(arg,ii,jj):
     disponible= Button(arg,text="Emplacement Disponible",image=voitureGUP,bg="green")
-    disponible.grid(row=2,column=ii-jj)
-    disponible.config(command=lambda:confirmation(ii-jj))
+    disponible.grid(row=4,column=ii+1)
+    disponible.config(command=lambda:confirmation(jj))
 def ResBut2(arg,ii,jj):
     reserve=Button(arg,text="Emplacement Reservé",image=voitureBUP,bg='blue')
-    reserve.grid(row=2,column=ii-jj)
+    reserve.grid(row=4,column=ii+1)
 def OccupBut2(arg,ii,jj):
     occupé=Button(arg,text="Emplacement Occupé",image=voitureRUP,bg='red')
-    occupé.grid(row=2,column=ii-jj)
+    occupé.grid(row=4,column=ii+1)
 def ProcheBut2(arg,ii,jj):
     proche=Button(arg,text="Emplacement le plus proche",image=voitureWUP,bg="yellow")
-    proche.grid(row=2,column=ii-jj)
-    proche.config(command=lambda:confirmation(ii-jj))
+    proche.grid(row=4,column=ii+1)
+    global e
+    p=0
+    for i in range(1,e):
+       p+=len(parEtage(i))
+    jj+=p
+    proche.config(command=lambda:confirmation(jj))
 
-def Affichage():
+def Affichage(etage=0):
     global debut
     global fin
-    print(Methode)
-    if(Methode==True):
-       d=getint(duree.get())
-       debut=datetime.datetime.now()
-       fin = datetime.timedelta(minutes=d)+datetime.datetime.now()
-       direct.destroy()
+    if (etage==0):
+        if(Methode==True):
+           d=getint(duree.get())
+           debut=datetime.datetime.now()
+           fin = datetime.timedelta(minutes=d)+datetime.datetime.now()
+           direct.destroy()
+        else:
+           d=getint(dure.get())
+           fin=datetime.timedelta(minutes=d)+debut
+           res.destroy
+        global aff
+        aff= Toplevel()
+        aff['bg']='LightSkyBlue4'
+        global e
+        e=1
     else:
-       d=getint(dure.get())
-       fin=datetime.timedelta(minutes=d)+debut
-       res.destroy
-    global aff
-    aff= Toplevel()
-    aff['bg']='gray'
-    #updateliste_emplacmenet(heure,dure)
-    n=len(list_emplacement[0])
-    if ((n%2)==0):
-        #l foo9
-        i=0
-        j=0
-        while (i<n-1):
-
-            if (list_emplacement[0][i].state(debut,fin)==0):
-                if (plusproche(list_emplacement)==i):
-                    ProcheBut1(aff,i,j)
-                else:
-                    DispoBut1(aff,i,j)
-            elif (list_emplacement[0][i].state(debut,fin)==2):
-                ResBut1(aff,i,j)
+        aff.destroy()
+        aff= Toplevel()
+        aff['bg']='LightSkyBlue4'
+        e=etage
+    global j
+    j=0 
+    affEmpl(j)
+    info=Info()
+    libre=Label(aff,text="Emplacements Libres:\t"+str(info[0]),bg='LightSkyBlue4', fg="green")
+    libre.grid(row=6,column=1, columnspan=5,pady=20)
+    libre.config(font=("Roman bold", 13,"bold"))
+    proche=Label(aff,text="L'Emplacement Le Plus Proche:\t"+str(plusproche(list_emplacement)+1000*list_emplacement[plusproche(list_emplacement)].get_etage()),bg='LightSkyBlue4', fg="yellow")
+    proche.grid(row=7,column=1, columnspan=5,pady=20)
+    proche.config(font=("Roman bold", 13,"bold"))
+    reserv=Label(aff,text="Emplacements Reservés:\t"+str(info[2]),bg='LightSkyBlue4', fg="blue")
+    reserv.grid(row=6,column=7, columnspan=5,pady=20)
+    reserv.config(font=("Roman bold", 13,"bold"))
+    occupe=Label(aff,text="Emplacements Occupées:\t"+str(info[1]),bg='LightSkyBlue4', fg="red")
+    occupe.grid(row=7,column=7, columnspan=5,pady=20)
+    occupe.config(font=("Roman bold", 13,"bold"))
+def newEtage():
+    global e
+    e+=1
+    if (parEtage(e)==[]):
+        e=1
+    global j
+    j=0
+    Affichage(e)
+def affEmpl(k):
+    global e
+    etage= Button(aff,text="ETAGE"+str(e),  bg='Deep Sky Blue3', fg="dark slate gray",height=2,width=12)
+    etage.grid(row=1,column=6)
+    etage.config(font=("Roman bold", 10,"bold"))
+    etage.config(command=newEtage)  
+    l=parEtage(e)
+    print(l[0].get_id())
+    n=len(l)
+    global j
+    j=k
+    if (j!=0):
+        p=Button(aff,text="<", bg='Deep Sky Blue3', fg="dark slate gray",height=28)
+        p.grid(row=2, column=0,rowspan=4)
+        p.config(command=lambda:affEmpl(k-22))
+    for i in range(0,11):        
+        if (l[j].state(debut,fin)==0):
+            if (plusproche(list_emplacement)==l[j].get_id()):
+                ProcheBut1(aff,i,j)
             else:
-                OccupBut1(aff,i,j)
-            i+=2
-            j+=1
-        #loota   
-        i=1
-        j=1
-        while(i<n):
-
-            if (list_emplacement[0][i].state(debut,fin)==0):
-                if (plusproche(list_emplacement)==i):
+                DispoBut1(aff,i,j)
+        elif (l[j].state(debut,fin)==2):
+            ResBut1(aff,i,j)
+        else:
+            OccupBut1(aff,i,j)
+        numEmpl= Label(aff,text=str(l[j].get_id()+(1000*e)),  bg='LightSkyBlue4', fg="dark slate gray",width=15)
+        numEmpl.grid(row=2,column=i+1)
+        j+=1
+        if (j==n):
+            "break"
+            break
+        else:
+            if (l[j].state(debut,fin)==0):
+                if (plusproche(list_emplacement)==l[j].get_id()):
                     ProcheBut2(aff,i,j)
                 else:
-                    DispoBut2(aff,i,j)
-            elif (list_emplacement[0][i].state(debut,fin)==2):
+                    DispoBut2(aff,i,l[j].get_id())
+            elif (l[j].state(debut,fin)==2):
                 ResBut2(aff,i,j)
             else:
                 OccupBut2(aff,i,j)
-            i+=2
-            j+=1
-    else:
-        #foo9
-        i=0
-        j=0
-        while(i<=n-1):
+        numEmpl= Label(aff,text=str(l[j].get_id()+(1000*e)),  bg='LightSkyBlue4', fg="dark slate gray",width=15)
+        numEmpl.grid(row=5,column=i+1)
+        j+=1
+        if (j==n):
+            "break2"
+            break
+    if(j<n):
+        nextp=Button(aff,text=">", bg='Deep Sky Blue3', fg="dark slate gray",height=28)
+        nextp.grid(row=2, column=13, columnspan=2, rowspan=4)
+        nextp.config(command=lambda:affEmpl(j))
+def parEtage(numEtage):
+    l=[]
+    for c in list_emplacement:
+        if (c.get_etage()==numEtage):
+            l.append(c)
+    return l
 
-            if (list_emplacement[0][i].state(debut,fin)==0):
-                if (plusproche(list_emplacement)==i):
-                    ProcheBut1(aff,i,j)
-                else:
-                    DispoBut1(aff,i,j)
-            elif (list_emplacement[0][i].state(debut,fin)==2):
-                ResBut1(aff,i,j)
-            else:
-                OccupBut1(aff,i,j)
-            i+=2
-            j+=1
-
-        #loota
-        i=1
-        j=1
-        while (i<n):
- 
-            if (list_emplacement[0][i].state(debut,fin)==0):
-                if(plusproche(list_emplacement)==i):
-                    ProcheBut2(aff,i,j)
-                else:
-                    DispoBut2(aff,i,j)
-            elif (list_emplacement[0][i].state(debut,fin)==2):
-                ResBut2(aff,i,j)
-            else:
-                OccupBut2(aff,i,j)
-            
-                #l foo9 ekher kaaba
-            i+=2
-            j+=1
-
-        if (list_emplacement[0][n].state(debut,fin)==0):
-            if (plusproche(list_emplacement)==n):
-                ProcheBut1(aff,n,0)
-            else:
-                DispoBut1(aff,n,0)
-        if (list_emplacement[0][n].state(debut,fin)==2):
-            ResBut1(aff,n,0)
-        if (list_emplacement[0][n].state(debut,fin)==1):
-                OccupBut1(aff,n,0)
-    aff.mainloop()
-
+def Info():
+    inf=[0]*3
+    for e in list_emplacement:
+        if (e.state(debut,fin)==0):
+            inf[0]+=1
+        elif (e.state(debut,fin)==1):
+            inf[1]+=1
+        else:
+            inf[2]+=1
+    return inf
 def confirmation(x):
-    MsgBox=messagebox.askquestion("Confirmation","Prière confirmer votre choix:\n\tEmplacement:"+str(list_emplacement[0][x].get_id())+"\n\tEtage:"+str(1)+"\n\tDebut:"+str(debut)+"\n\tFin:"+str(fin))
+    global e
+    MsgBox=messagebox.askquestion("Confirmation","Prière confirmer votre choix:\n\tEmplacement:"+str(list_emplacement[x].get_id()+e*1000)+"\n\tEtage:"+str(e)+"\n\tDebut:"+str(debut)+"\n\tFin:"+str(fin))
     if (MsgBox=='yes'):
         choix(x)
 def choix(x):
     if (Methode):
-        list_emplacement[0][x].occupe(fin)
+        list_emplacement[x].occupe(fin)
         aff.destroy()
-        bd.updateEmplacement(list_emplacement[0][x])
+        bd.updateEmplacement(list_emplacement[x])
         Home()
     else:
-        list_emplacement[0][x].add_reservation(debut,fin)
-        bd.updateEmplacement(list_emplacement[0][x])
+        list_emplacement[x].add_reservation(debut,fin)
+        bd.updateEmplacement(list_emplacement[x])
         if (Recherche_Client(cin)==-1):     
            c=Client(name,cin,x,True,[debut,fin])
            list_client.append(c)
@@ -433,8 +465,8 @@ def choix(x):
 #plus proche
 def plusproche(liste):
     l=0
-    while (l<len(liste[0])):
-       if (liste[0][l].state(debut,fin)==0):
+    while (l<len(liste)):
+       if (liste[l].state(debut,fin)==0):
           return l
        else:
           l+=1

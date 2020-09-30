@@ -123,7 +123,7 @@ class BD:
         sql="SELECT MAX(idEtage) FROM PARKING"
         curseur.execute(sql)
         N=curseur.fetchall()[0][0]
-        parking=[[0]]*N
+        parking=[]
         #liste des tuple des données
         sql2="SELECT * FROM PARKING "
         curseur.execute(sql2)
@@ -151,9 +151,8 @@ class BD:
                 for j in range (0,len(o)):
                     o[j]=self.stringtotime(o[j])
             emplacement=Emplacement(id,etage,r,o)
-            parking[etage-1].append(emplacement)
-        for i in range(0, len(parking)):
-            parking[i].pop(0)
+            print(emplacement.get_id())
+            parking.append(emplacement)
         curseur.close()
         conn.close()
         return parking
