@@ -38,7 +38,6 @@ class Emplacement:
                 if ((self.__date_res[i]<=debut) and (self.__date_res[i+1]>=fin)):
                     return 2
             if((fin<=self.__date_res[0])or(debut>self.__date_res[-1])):
-                print("etapefaulse")
                 return 0
             else:
                 i=1
@@ -63,8 +62,7 @@ class Emplacement:
                     break
             if(n!=len(self.__date_res)):
                 self.__date_res=self.__date_res[n+1:]
-        print(self.__occupe)
-        print(self.__date_res)
+
 
     def add_reservation(self,debut,fin):
         if (debut>=fin):

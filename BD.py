@@ -62,7 +62,6 @@ class BD:
                 periode[1]=self.stringtotime(periode[1])
             c=Client(l[i][0],l[i][1],l[i][4],l[i][2],periode)
             clients+=[c]
-        print(clients)
         curseur.close()
         conn.close()
         return clients
@@ -128,7 +127,6 @@ class BD:
         sql2="SELECT * FROM PARKING "
         curseur.execute(sql2)
         l=curseur.fetchall()
-        print(l)
         for i in range(len(l)):
             id=int(l[i][0])
             etage=int(l[i][1])
@@ -151,7 +149,6 @@ class BD:
                 for j in range (0,len(o)):
                     o[j]=self.stringtotime(o[j])
             emplacement=Emplacement(id,etage,r,o)
-            print(emplacement.get_id())
             parking.append(emplacement)
         curseur.close()
         conn.close()
@@ -163,7 +160,6 @@ class BD:
         #time to string
         rstr=""
         r=e.get_date_de_res()
-        print(r)
         for i in range (0,len(r)):
             rstr=rstr+"*"+str(r[i])
         ostr=""
