@@ -5,10 +5,12 @@ from Clients import Client
 from Emplacement import Emplacement
 import datetime
 import time
+
 h = Toplevel()
 h['bg']='blue'
 h.destroy()
 
+#images utilisées dans l'interface
 voitureRUP=PhotoImage(file = r".\images\RCarUp.png")
 voitureRDOWN=PhotoImage(file = r".\images\RCarDown.png")
 voitureBUP=PhotoImage(file = r".\images\BCarUp.png")
@@ -19,10 +21,10 @@ voitureWUP=PhotoImage(file=r".\images\WCarUP.png")
 voitureWDOWN=PhotoImage(file=r".\images\WCarDown.png")
 
 
-#liste client tkoon global
-#liste emplacemnt , w methode te3ha
-#methode add client
+#prendre les données de base de donnée
 bd=BD("parking.sql")
+global list_client
+global list_emplacement
 list_client=bd.listClients()
 list_emplacement=bd.listEmplacement()
 
@@ -31,65 +33,83 @@ list_emplacement=bd.listEmplacement()
 
 #Menu principal
 def Home(i=0):
+
+    #i est utilisé pour connaitre l'exacte toplevel à supprimer lorsque on click annuler
     if (i==1):
         direct.destroy()
     elif (i==2):
         gres.destroy()
     elif (i==3):
         res.destroy()
+    elif (i==4):
+        aff.destroy()
+
     global homePage
     homePage = Toplevel()
     homePage['bg']='LightSkyBlue4'
+
     label = Label(homePage, text="Bienvenue",bg='LightSkyBlue4', fg="SkyBlue3" )
     label.config(font=("Roman bold", 60,"bold"))
     label.pack(pady=5)
+
     reservation=Button(homePage,text ="Gestion de réservartion", bg='Deep Sky Blue3' ,fg='dark slate gray',height=4,width=25)
     reservation.pack(pady=40)
     reservation.config(font=("Roman bold", 17,"bold"))
     reservation.config(command = gest_reservation)
+
     surplace=Button(homePage,text ="Parking direct", bg='Deep Sky Blue3', fg="dark slate gray",height=4,width=25 )
     surplace.pack(pady=10)
     surplace.config(font=("Roman bold", 17,"bold"))
     surplace.config(command = parking_direct)
+
     homePage.mainloop()
 
 #Parking sur place
 def parking_direct():
+    
+    #Methode pour connaitre si l'action est une reservation ou direct
     global Methode
     Methode=True
     homePage.destroy()
+    
     global direct 
     direct = Toplevel()
     direct['bg']='LightSkyBlue4'
+
     l=Label(direct, text="Bienvenue, merci d'indiquer la durée de \nvotre visite et puis choisir votre emplacement",bg='LightSkyBlue4', fg="SkyBlue3")
     l.pack(pady=50)
     l.config(font=("Roman bold", 40,"bold"))
+
     global duree
     duree= Entry(direct,width= 60,textvariable=DoubleVar(), bg='LightSkyBlue3', fg="SkyBlue4")
     duree.insert(0,"Durée de visite en minutes")
     duree.config(font=("Roman bold", 17,"bold"))
     duree.pack(pady=2)
+
     global confirmd
     confirmd= Button(direct,text="Choisir",  bg='Deep Sky Blue3', fg="dark slate gray",height=2,width=15)
     confirmd.pack()
     confirmd.config(font=("Roman bold", 10,"bold"))
     confirmd.config(command = validation)
+
     annuler= Button(direct,text="Annuler",  bg='Deep Sky Blue3', fg="dark slate gray",height=2,width=15)
     annuler.pack(pady=8)
     annuler.config(font=("Roman bold", 10,"bold"))
     annuler.config(command = lambda: Home(1))
 
+#le commande ne passe pas que si la durée est un entier et ne depasse pas 24H donc on doit le verifier avant confirmation avec cette methode
 def validation():
+
     if ((duree.get().isdigit())and(getint(duree.get())>0)):
         if (getint(duree.get())>1440):
             l2=Label(direct,text="*La durée ne dépasse pas 1440 minutes (24H)", bg="LightSkyBlue4",fg="red")
             l2.pack(pady=2, before=confirmd)   
         else :
             Affichage()
+
     else:
         l2=Label(direct,text="*La durée doit etre en minutes", bg="LightSkyBlue4",fg="red")
         l2.pack(pady=2, before=confirmd)
-
 
 #Vérification du client
 def Recherche_Client(num):
@@ -106,46 +126,39 @@ def Recherche_Client(num):
    else:
       return -1
 
-#Recherche emplacement
-def Recherche_Emplacement(id):
-   test= False
-   i=0
-   for c in list_emplacement:
-      if (c.get_id()==id):
-         test=True
-         break
-      else:
-          i+=1
-   if (test==True):
-      return i
-   else:
-      return -1
 
 #Gestion de reservartion  
 def gest_reservation():
+
     homePage.destroy()
+
     global gres
     gres= Toplevel()
     gres['bg']='LightSkyBlue4'
+
     labelr = Label(gres, text="Gestion De Réservartion", bg='LightSkyBlue4', fg="SkyBlue3" )
     labelr.config(font=("Roman bold", 40,"bold"))
     labelr.pack(pady=5)
+
     cin=Entry(gres,width= 60, textvariable=DoubleVar(), bg='LightSkyBlue3', fg="SkyBlue4")
     cin.insert(0,"Merci de nous fournir votre numéro de CIN")
     cin.config(font=("Roman bold", 17,"bold"))
     cin.pack(pady=20)
     global ciin
     ciin=cin
+
     global reserver
     reserver = Button(gres,text="Reserver",  bg='Deep Sky Blue3', fg="dark slate gray",height=2,width=15)
     reserver.pack(pady=5)
     reserver.config(font=("Roman bold", 10,"bold"))
     reserver.config(command=verif_cin)
+
     annuler= Button(gres,text="Annuler",  bg='Deep Sky Blue3', fg="dark slate gray",height=2,width=15)
     annuler.pack(pady=8)
     annuler.config(font=("Roman bold", 10,"bold"))
     annuler.config(command = lambda: Home(2))
 
+#la methode reservation() ne doit pas etre appeler que après verifier si le cin est de 8 numeros
 def verif_cin():
     if((len(ciin.get())==8)and (ciin.get().isdigit())):
         reservartion()
@@ -154,6 +167,8 @@ def verif_cin():
         l2.pack(pady=2, before=reserver)
         
 def reservartion():
+
+    #Methode est le meme bool pour verifier quel est l'action à traiter
     global cin
     cin=str(ciin.get())
     print('testeee')
@@ -166,67 +181,93 @@ def reservartion():
     global dure
     global heure
     global choisir
+
+    #si le client exist deja dans la base de donnée
     if ((Recherche_Client(cin)!=-1)):
+        #si le client n'a pas une reservation en cour 
         if (not(list_client[Recherche_Client(cin)].reservation_exist())):
+
             label= Label(res,text="On est heureux de vous revoir chez nous Mr/Mme "+list_client[Recherche_Client(cin)].get_nom()+",\nmerci d'indiquer l'heure et la durée de votre visite \net puis choisir votre emplacement,\nmerci ", bg='LightSkyBlue4', fg="SkyBlue3")
-            label.config(font=("Roman bold", 40,"bold"))
+            label.config(font=("Roman bold", 30,"bold"))
             label.pack(pady=25)
+
             global heure
             heure= Entry(res, width=60,textvariable=DoubleVar(),bg='LightSkyBlue3', fg="SkyBlue4")
             heure.insert(0,"L'heure de votre arrivé comme la suite YYYY-MM-DD HH:MM")
             heure.config(font=("Roman bold", 17,"bold"))
             heure.pack(pady=2)
+
             global dure
             dure= Entry(res, width=60,textvariable=DoubleVar(),bg='LightSkyBlue3', fg="SkyBlue4")
             dure.insert(0,"Durée") # bch taamel mise à jour 
             dure.config(font=("Roman bold", 17,"bold"))
             dure.pack(pady=2)
+
             choisir=Button(res,text="Chosir votre emplacement", bg='Deep Sky Blue3', fg="dark slate gray",height=2,width=25)
             choisir.pack(pady=2)
             choisir.config(font=("Roman bold", 10,"bold"))
             choisir.config(command=verif_date)
+
             annuler= Button(res,text="Annuler",  bg='Deep Sky Blue3', fg="dark slate gray",height=2,width=15)
             annuler.pack(pady=8)
             annuler.config(font=("Roman bold", 10,"bold"))
             annuler.config(command = lambda: Home(3))
+        #si le client a deja une reservation en cour,on doit verifier si la date de debut de reservation depasse la date à l'instant ou la reservation pas valable à l'instant debut> temps à l'instant
         else:
             c=list_client[Recherche_Client(cin)]
             duration=c.get_periode()
+            e=c.get_emplacement()
             if ((duration[0]<=datetime.datetime.now())and (datetime.datetime.now()<duration[1])):
-                MsgBox=messagebox.askquestion("Reservation","Vous avez une reservation\n\tEmplacement:"+str(c.get_emplacement())+"\n\tEtage:"+str(1)+"\n\tDebut:"+str(duration[0])+"\n\tFin:"+str(duration[1])+"\nCliquez non pour annuler la réservation")
+                MsgBox=messagebox.askquestion("Reservation","Vous avez une reservation\n\tEmplacement:"+str(e)+"\n\tEtage:"+str(list_emplacement[e].get_etage())+"\n\tDebut:"+str(duration[0])+"\n\tFin:"+str(duration[1])+"\nCliquez non pour annuler la réservation")
                 if (MsgBox=='yes'):
-                    e=Recherche_Emplacement(c.get_emplacement())
-                    list_emplacement[e].fin_reservation()                        
+                    list_emplacement[e].fin_reservation()
+                    print(list_emplacement[e].get_date_de_res())
                     list_emplacement[e].occupe(duration[1])
+                    print(list_emplacement[e].get_occupe())
                     bd.updateEmplacement(list_emplacement[e])
                 else:
-                    e=Recherche_Emplacement(c.get_emplacement())
                     list_emplacement[e].fin_reservation()
+                    c.res_finis()
+                    bd.updateClient(c)
                     bd.updateEmplacement(list_emplacement[e])
-            Home()
+                Home()
+            elif (duration[0]>datetime.datetime.now()):
+                MsgBox=messagebox.askquestion("Reservation mais pas valable à l'instant","Vous avez une reservation\n\tEmplacement:"+str(e)+"\n\tEtage:"+str(list_emplacement[e].get_etage())+"\n\tDebut:"+str(duration[0])+"\n\tFin:"+str(duration[1])+"\nCliquez oui pour annuler la réservation et faire une reservation à 'linstant et non pour attendre la date de reservation ")
+                if (MsgBox=='yes'):
+                    print(list_emplacement[e].get_date_de_res())
+                    list_emplacement[e].fin_reservation()
+                    print(list_emplacement[e].get_date_de_res())
+                    bd.updateEmplacement(list_emplacement[e])
+                    parking_direct()
+                else:
+                    Home()
     else:
             #création d'un client
             label= Label(res,text="Merci pour avoir nous visiter\n Merci d'indiquer votre nom",bg='LightSkyBlue4', fg="SkyBlue3")
             label.config(font=("Roman bold", 40,"bold"))
             label.pack(pady=25)
+
+            global nom
             nom= Entry(res,width=60,textvariable=DoubleVar(),bg='LightSkyBlue3', fg="SkyBlue4")
-            nom.insert(0,"Votre nom")
             nom.config(font=("Roman bold", 17,"bold"))
             nom.pack(pady=2)
-            global name
-            name=nom.get()
+            nom.insert(0,"Votre nom")
+
             heure= Entry(res, width=60,textvariable=DoubleVar(),bg='LightSkyBlue3', fg="SkyBlue4")
             heure.pack(pady=2)
             heure.insert(0,"L'heure de votre arrivé comme la suite YYYY-MM-DD HH:MM")
             heure.config(font=("Roman bold", 17,"bold"))
+
             dure= Entry(res, width=60,textvariable=DoubleVar(),bg='LightSkyBlue3', fg="SkyBlue4")
             dure.config(font=("Roman bold", 17,"bold"))
             dure.pack(pady=2)
             dure.insert(0,"Durée") # bch taamel mise à jour
+
             choisir=Button(res,text="Chosir votre emplacement",bg='Deep Sky Blue3', fg="dark slate gray",height=2,width=25)
             choisir.pack(pady=15)
             choisir.config(font=("Roman bold", 10,"bold"))
             choisir.config(command=verif_date) #fct taamel l affichag
+
             annuler= Button(res,text="Annuler",  bg='Deep Sky Blue3', fg="dark slate gray",height=2,width=15)
             annuler.pack(pady=8)
             annuler.config(font=("Roman bold", 10,"bold"))
@@ -333,7 +374,11 @@ def Affichage(etage=0):
         else:
            d=getint(dure.get())
            fin=datetime.timedelta(minutes=d)+debut
-           res.destroy
+           if (Recherche_Client(cin)==-1):
+               global nom
+               global name
+               name=str(nom.get())
+           res.destroy()
         global aff
         aff= Toplevel()
         aff['bg']='LightSkyBlue4'
@@ -360,6 +405,10 @@ def Affichage(etage=0):
     occupe=Label(aff,text="Emplacements Occupées:\t"+str(info[1]),bg='LightSkyBlue4', fg="red")
     occupe.grid(row=7,column=7, columnspan=5,pady=20)
     occupe.config(font=("Roman bold", 13,"bold"))
+    annuler= Button(aff,text="Annuler",  bg='Deep Sky Blue3', fg="dark slate gray",height=2,width=12)
+    annuler.grid(row=8,column=6)
+    annuler.config(font=("Roman bold", 10,"bold"))
+    annuler.config(command = lambda: Home(4))
 def newEtage():
     global e
     e+=1
@@ -442,6 +491,8 @@ def confirmation(x):
     if (MsgBox=='yes'):
         choix(x)
 def choix(x):
+    global list_emplacement
+    global list_client
     if (Methode):
         list_emplacement[x].occupe(fin)
         aff.destroy()
@@ -450,10 +501,10 @@ def choix(x):
     else:
         list_emplacement[x].add_reservation(debut,fin)
         bd.updateEmplacement(list_emplacement[x])
-        if (Recherche_Client(cin)==-1):     
+        if (Recherche_Client(cin)==-1):
            c=Client(name,cin,x,True,[debut,fin])
-           list_client.append(c)
            bd.addClient(c)
+           list_client=bd.listClients()
         else:
            k=Recherche_Client(cin)
            list_client[k].reservation([debut,fin],x)

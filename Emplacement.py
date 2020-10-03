@@ -110,6 +110,28 @@ class Emplacement:
         if (len(self.__date_res)<=2):
             self.__date_res=[]
         else:
+            n=0
+            for i in range(0,len(self.__date_res)):
+                if (datetime.datetime.now()<=self.__date_res[i]):
+                    n+=1
+                else:
+                    n+=1
+                    break
+            if ((n%2==0)and (n!=0)):
+                self.__date_res=self.__date_res[n:]
+            elif (n%2==1):
+                if (n==len(self.__date_res)-1):
+                    self.__date_res=[]
+                else:
+                    self.__date_res=self.__date_res[n+1:]
+            
+            if (len(self.__date_res)<=2):
+                self.__date_res=[]
+            else:
+                self.__date_res=self.__date_res[2:]
+        if (len(self.__date_res)<=2):
+            self.__date_res=[]
+        else:
             self.__date_res=self.__date_res[2:]
 
     def libre(self):
